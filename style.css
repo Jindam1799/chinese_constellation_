@@ -1,0 +1,223 @@
+:root {
+  --neon-green: #00e676;
+  --neon-blue: #2979ff;
+  --bg-dark: #090a0f;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-dark);
+  font-family: 'Pretendard', sans-serif;
+  overflow: hidden;
+  color: white;
+}
+
+/* 로비 스타일 */
+#lobby-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+  overflow-y: auto;
+}
+.lobby-header {
+  text-align: center;
+  margin: 50px 0;
+}
+.lobby-header h1 {
+  font-size: 42px;
+  color: var(--neon-blue);
+  text-shadow: 0 0 15px var(--neon-blue);
+}
+#stage-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  max-width: 600px;
+}
+.stage-btn {
+  width: 70px;
+  height: 70px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.stage-btn.completed {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+}
+
+/* 게임 화면 레이아웃 분리 */
+#game-screen {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* 별들이 노는 영역: 하단 독(160px)을 제외한 공간만 사용 */
+#play-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 180px); /* 하단 바와 겹치지 않게 높이 제한 */
+}
+
+#constellation-svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.path {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 2;
+  fill: none;
+  transition: 0.5s;
+  stroke-dasharray: 5;
+}
+.path.active {
+  stroke: var(--neon-green);
+  stroke-width: 4;
+  filter: drop-shadow(0 0 10px var(--neon-green));
+  stroke-dasharray: 0;
+}
+
+.node {
+  position: absolute;
+  width: 85px;
+  height: 85px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(5px);
+}
+.node.highlight {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 20px var(--neon-green);
+}
+
+/* 단어 카드 스타일 */
+.star-tile {
+  width: 90px;
+  height: 90px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  transition: transform 0.2s;
+  user-select: none;
+  flex-shrink: 0;
+}
+.star-tile .hanzi {
+  font-size: 44px;
+  font-weight: bold;
+  color: #fff;
+}
+.star-tile .pinyin {
+  font-size: 14px;
+  opacity: 0.5;
+  margin-top: 2px;
+} /* 투명도 50% */
+
+/* 하단 바 (Word Dock) - 넘침 방지 고도화 */
+#word-dock {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1000px;
+  min-height: 120px;
+  max-height: 160px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(15px);
+  padding: 10px;
+  overflow-y: auto; /* 단어가 너무 많으면 바 안에서 스크롤 */
+}
+#dock-inner {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap; /* 단어가 많으면 다음 줄로 */
+  justify-content: center;
+  width: 100%;
+}
+
+.star-tile.dragging {
+  opacity: 0.8;
+  transform: scale(1.1);
+  z-index: 2000;
+}
+.star-tile.locked {
+  background: var(--neon-blue);
+  box-shadow: 0 0 20px var(--neon-blue);
+  cursor: default;
+}
+
+#header {
+  position: absolute;
+  top: 30px;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+.back-btn {
+  position: absolute;
+  left: 30px;
+  top: 0;
+  pointer-events: auto;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+#victory-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.popup {
+  text-align: center;
+  border: 1px solid var(--neon-green);
+  padding: 50px;
+  border-radius: 40px;
+  background: #0a0f1e;
+}
+.popup button {
+  margin: 10px;
+  padding: 12px 30px;
+  border-radius: 25px;
+  border: none;
+  background: var(--neon-green);
+  font-weight: bold;
+  cursor: pointer;
+}
+.hidden {
+  display: none !important;
+}

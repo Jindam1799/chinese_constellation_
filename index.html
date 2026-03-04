@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>진담중국어 - 중국어 별자리 퍼즐</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="lobby-screen">
+      <div class="lobby-header">
+        <h1>CHINESE CONSTELLATION</h1>
+        <p>언어의 별자리를 완성하여 우주를 밝히세요</p>
+      </div>
+      <div id="stage-grid"></div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+      <div id="star-field">
+        <div id="play-area">
+          <svg id="constellation-svg"></svg>
+          <div id="node-container"></div>
+        </div>
+
+        <div id="header">
+          <button class="back-btn" onclick="showLobby()">← LOBBY</button>
+          <h1 id="stage-num">STAGE 01</h1>
+          <p id="mission-desc">단어 별을 옮겨 문장 별자리를 완성하세요</p>
+        </div>
+
+        <div id="word-dock">
+          <div id="dock-inner"></div>
+        </div>
+
+        <div id="victory-overlay" class="hidden">
+          <div class="popup">
+            <h2>✨ MISSION COMPLETE ✨</h2>
+            <p>문장 별자리가 깨어났습니다!</p>
+            <div class="popup-btns">
+              <button onclick="showLobby()">로비로</button>
+              <button onclick="loadNextStage()">다음 별자리</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="scripts.js"></script>
+  </body>
+</html>
