@@ -10,7 +10,6 @@ body {
   font-family: 'Pretendard', sans-serif;
   overflow: hidden;
   color: white;
-  /* 모바일에서 드래그 중 텍스트 선택 및 새로고침 방지 */
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
@@ -65,39 +64,49 @@ body {
   height: 100vh;
   position: relative;
 }
-
-/* 모바일 화면을 고려한 플레이 영역 높이 재설정 */
 #play-area {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 160px);
-}
+  height: calc(100% - 170px);
+} /* 하단 공간 더 확보 */
 #constellation-svg {
   position: absolute;
   width: 100%;
   height: 100%;
   pointer-events: none;
+  z-index: 1;
 }
+
 .path {
-  stroke: rgba(255, 255, 255, 0.1);
-  stroke-width: 2;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 3;
   fill: none;
-  transition: 0.5s;
-  stroke-dasharray: 5;
+  transition:
+    stroke 0.5s,
+    stroke-width 0.5s;
+  stroke-dasharray: 10 10;
+  animation: flowPath 1.5s linear infinite;
 }
 .path.active {
   stroke: var(--neon-green);
   stroke-width: 4;
-  filter: drop-shadow(0 0 10px var(--neon-green));
-  stroke-dasharray: 0;
+  filter: drop-shadow(0 0 8px var(--neon-green));
+  stroke-dasharray: 15 10;
+  animation: flowPath 0.8s linear infinite;
+}
+@keyframes flowPath {
+  to {
+    stroke-dashoffset: -40;
+  }
 }
 
+/* [수정됨] 정거장(노드) 크기를 약간 줄여 겹침 방지 */
 .node {
   position: absolute;
-  width: 85px;
-  height: 85px;
+  width: 70px;
+  height: 70px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   transform: translate(-50%, -50%);
@@ -106,18 +115,37 @@ body {
   justify-content: center;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(5px);
+  z-index: 2;
 }
 .node.highlight {
   border-color: var(--neon-green);
   box-shadow: 0 0 20px var(--neon-green);
 }
 
+.hint-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+.node.start-node {
+  border-color: rgba(41, 121, 255, 0.6);
+  background: rgba(41, 121, 255, 0.1);
+  box-shadow: inset 0 0 10px rgba(41, 121, 255, 0.3);
+}
+.node.filled .hint-text {
+  display: none;
+}
+
+/* [수정됨] 단어 타일 크기 축소하여 가독성과 공간 확보 */
 .star-tile {
-  width: 85px;
-  height: 85px;
+  width: 75px;
+  height: 75px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 18px;
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -125,49 +153,67 @@ body {
   cursor: grab;
   transition: transform 0.2s;
   flex-shrink: 0;
+  z-index: 3;
 }
 .star-tile .hanzi {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: bold;
   color: #fff;
 }
 .star-tile .pinyin {
-  font-size: 13px;
-  opacity: 0.5;
+  font-size: 12px;
+  opacity: 0.6;
   margin-top: 2px;
 }
 
+/* [수정됨] Word Dock 스크롤 최적화 및 최대 높이 증가 */
 #word-dock {
   position: absolute;
-  bottom: 15px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
-  max-width: 800px;
-  min-height: 110px;
-  max-height: 150px;
+  max-width: 900px;
+  min-height: 90px;
+  max-height: 200px;
   background: rgba(0, 0, 0, 0.6);
-  border-radius: 25px;
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   backdrop-filter: blur(15px);
-  padding: 10px;
+  padding: 15px 10px;
   overflow-y: auto;
+  z-index: 10;
 }
+/* 스크롤바 예쁘게 커스텀 */
+#word-dock::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+#word-dock::-webkit-scrollbar-thumb {
+  background: rgba(0, 230, 118, 0.5);
+  border-radius: 10px;
+}
+#word-dock::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 #dock-inner {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
+  padding-bottom: 5px;
 }
 
 .star-tile.dragging {
-  opacity: 0.8;
-  transform: scale(1.1);
+  opacity: 0.9;
+  transform: scale(1.15);
   z-index: 2000;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
 }
 .star-tile.locked {
   background: var(--neon-blue);
@@ -177,7 +223,7 @@ body {
 
 #header {
   position: absolute;
-  top: 20px;
+  top: 15px;
   width: 100%;
   text-align: center;
   pointer-events: none;
@@ -185,10 +231,11 @@ body {
 }
 #stage-num {
   margin: 0;
-  font-size: 28px;
+  font-size: 26px;
   letter-spacing: 2px;
   color: var(--neon-blue);
   text-shadow: 0 0 10px var(--neon-blue);
+  line-height: 1.2;
 }
 #mission-desc {
   margin-top: 5px;
@@ -220,11 +267,35 @@ body {
 .popup {
   text-align: center;
   border: 1px solid var(--neon-green);
-  padding: 40px 20px;
+  padding: 30px 20px;
   border-radius: 30px;
   background: #0a0f1e;
-  width: 80%;
-  max-width: 400px;
+  width: 85%;
+  max-width: 500px;
+}
+.popup h2 {
+  margin-top: 0;
+  color: #fff;
+}
+
+.victory-answer {
+  margin: 25px auto;
+  padding: 20px;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid var(--neon-green);
+  border-radius: 20px;
+  font-size: 24px;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: inset 0 0 15px rgba(0, 230, 118, 0.2);
+  line-height: 1.4;
+}
+.victory-answer .kor {
+  display: block;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 10px;
+  font-weight: normal;
 }
 .popup button {
   margin: 10px 5px;
@@ -240,7 +311,7 @@ body {
   display: none !important;
 }
 
-/* 모바일 전용 반응형 설정 */
+/* 모바일 전용 반응형 한층 더 최적화 */
 @media (max-width: 768px) {
   .lobby-header h1 {
     font-size: 28px;
@@ -256,29 +327,42 @@ body {
   }
 
   .node {
-    width: 65px;
-    height: 65px;
+    width: 55px;
+    height: 55px;
   }
   .star-tile {
-    width: 65px;
-    height: 65px;
+    width: 60px;
+    height: 60px;
     border-radius: 12px;
   }
   .star-tile .hanzi {
-    font-size: 32px;
+    font-size: 28px;
   }
   .star-tile .pinyin {
     font-size: 11px;
   }
+  .hint-text {
+    font-size: 12px;
+  }
 
+  #word-dock {
+    max-height: 180px;
+  }
   #header {
-    top: 15px;
+    top: 10px;
   }
   #stage-num {
-    font-size: 20px;
+    font-size: 18px;
   }
   .back-btn {
     font-size: 12px;
     padding: 6px 10px;
+  }
+  .victory-answer {
+    font-size: 18px;
+    padding: 15px;
+  }
+  .victory-answer .kor {
+    font-size: 13px;
   }
 }
