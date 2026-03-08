@@ -1,1288 +1,436 @@
-const TOTAL_STAGES = 30;
-let currentStageIdx = 0;
-
-const TILE_DATA = {
-  wo: { hanzi: '我', pinyin: 'wǒ' },
-  ta: { hanzi: '他', pinyin: 'tā' },
-  ni: { hanzi: '你', pinyin: 'nǐ' },
-  mama: { hanzi: '妈妈', pinyin: 'māma' },
-  baba: { hanzi: '爸爸', pinyin: 'bàba' },
-  yeye: { hanzi: '爷爷', pinyin: 'yéye' },
-  nainai: { hanzi: '奶奶', pinyin: 'nǎinai' },
-  laoshi: { hanzi: '老师', pinyin: 'lǎoshī' },
-  pengyou: { hanzi: '朋友', pinyin: 'péngyou' },
-  gege: { hanzi: '哥哥', pinyin: 'gēge' },
-  jiejie: { hanzi: '姐姐', pinyin: 'jiějie' },
-  didi: { hanzi: '弟弟', pinyin: 'dìdi' },
-  meimei: { hanzi: '妹妹', pinyin: 'mèimei' },
-  yisheng: { hanzi: '医生', pinyin: 'yīshēng' },
-  xuesheng: { hanzi: '学生', pinyin: 'xuésheng' },
-
-  he_v1: { hanzi: '喝', pinyin: 'hē' },
-  he_v2: { hanzi: '喝', pinyin: 'hē' },
-  chi1: { hanzi: '吃', pinyin: 'chī' },
-  chi2: { hanzi: '吃', pinyin: 'chī' },
-  qu1: { hanzi: '去', pinyin: 'qù' },
-  qu2: { hanzi: '去', pinyin: 'qù' },
-  kan1: { hanzi: '看', pinyin: 'kàn' },
-  kan2: { hanzi: '看', pinyin: 'kàn' },
-  mai1: { hanzi: '买', pinyin: 'mǎi' },
-  mai2: { 연zi: '买', pinyin: 'mǎi' },
-  xihuan1: { hanzi: '喜欢', pinyin: 'xǐhuān' },
-  xihuan2: { hanzi: '喜欢', pinyin: 'xǐhuān' },
-  ai: { hanzi: '爱', pinyin: 'ài' },
-  shuo: { hanzi: '说', pinyin: 'shuō' },
-  ting: { hanzi: '听', pinyin: 'tīng' },
-  xuexi: { hanzi: '学习', pinyin: 'xuéxí' },
-
-  shui: { hanzi: '水', pinyin: 'shuǐ' },
-  kafei: { hanzi: '咖啡', pinyin: 'kāfēi' },
-  fan: { hanzi: '饭', pinyin: 'fàn' },
-  pingguo: { hanzi: '苹果', pinyin: 'píngguǒ' },
-  beijing: { hanzi: '北京', pinyin: 'běijīng' },
-  jia: { hanzi: '家', pinyin: 'jiā' },
-  shu: { hanzi: '书', pinyin: 'shū' },
-  dianshi: { hanzi: '电视', pinyin: 'diànshì' },
-  mianbao: { hanzi: '面包', pinyin: 'miànbāo' },
-  mian: { hanzi: '面', pinyin: 'miàn' },
-  cha: { hanzi: '茶', pinyin: 'chá' },
-  xuexiao: { hanzi: '学校', pinyin: 'xuéxiào' },
-  shangdian: { hanzi: '商店', pinyin: 'shāngdiàn' },
-  yiyuan: { hanzi: '医院', pinyin: 'yīyuàn' },
-  dianying: { hanzi: '电影', pinyin: 'diànyǐng' },
-  pijiu: { hanzi: '啤酒', pinyin: 'píjiǔ' },
-  hanyu: { hanzi: '汉语', pinyin: 'hànyǔ' },
-  ge: { hanzi: '歌', pinyin: 'gē' },
-  zhongguo: { hanzi: '中国', pinyin: 'zhōngguó' },
-
-  bu: { hanzi: '不', pinyin: 'bù' },
-  hen: { hanzi: '很', pinyin: 'hěn' },
-  dou: { hanzi: '都', pinyin: 'dōu' },
-  ye: { hanzi: '也', pinyin: 'yě' },
-  jintian: { hanzi: '今天', pinyin: 'jīntiān' },
-  mingtian: { hanzi: '明天', pinyin: 'míngtiān' },
-  yinwei: { hanzi: '因为', pinyin: 'yīnwèi' },
-  suoyi: { hanzi: '所以', pinyin: 'suǒyǐ' },
-  zai: { hanzi: '在', pinyin: 'zài' },
-  men: { hanzi: '们', pinyin: 'men' },
-  de: { hanzi: '的', pinyin: 'de' },
-  le: { hanzi: '了', pinyin: 'le' },
-  hao: { hanzi: '好', pinyin: 'hǎo' },
-  gaoxing: { hanzi: '高兴', pinyin: 'gāoxìng' },
-  mang: { hanzi: '忙', pinyin: 'máng' },
-
-  he_conj1: { hanzi: '和', pinyin: 'hé' },
-  he_conj2: { hanzi: '和', pinyin: 'hé' },
-  he_conj3: { hanzi: '和', pinyin: 'hé' },
-};
-
-const STAGES = [
-  {
-    level: 1,
-    title: '작은개자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'wo' },
-      { id: 'n2', x: 50, y: 50, expect: 'he_v1' },
-      { id: 'n3', x: 80, y: 50, expect: 'shui' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-    ],
-    pool: ['wo', 'he_v1', 'shui'],
-    answer: "我喝水。<br><span class='kor'>나는 물을 마신다.</span>",
-  },
-  {
-    level: 2,
-    title: '화살자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'mama' },
-      { id: 'n2', x: 50, y: 50, expect: 'mai1' },
-      { id: 'n3', x: 80, y: 30, expect: 'pingguo' },
-      { id: 'n4', x: 80, y: 70, expect: 'mianbao' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-    ],
-    pool: ['mama', 'mai1', 'pingguo', 'mianbao'],
-    answer:
-      "妈妈买苹果和面包。<br><span class='kor'>엄마는 사과와 빵을 산다.</span>",
-  },
-  {
-    level: 3,
-    title: '삼각형자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'ta' },
-      { id: 'n2', x: 50, y: 30, expect: 'chi1' },
-      { id: 'n3', x: 80, y: 50, expect: 'fan' },
-      { id: 'n4', x: 50, y: 70, expect: 'xihuan1' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n1', to: 'n4' },
-      { from: 'n4', to: 'n3' },
-    ],
-    pool: ['ta', 'chi1', 'fan', 'xihuan1'],
-    answer:
-      "他吃饭，喜欢饭。<br><span class='kor'>그는 밥을 먹고, 밥을 좋아한다.</span>",
-  },
-  {
-    level: 4,
-    title: '남십자성',
-    nodes: [
-      { id: 'n1', x: 20, y: 30, expect: 'baba' },
-      { id: 'n2', x: 20, y: 70, expect: 'mama' },
-      { id: 'n3', x: 50, y: 50, expect: 'qu1' },
-      { id: 'n4', x: 80, y: 30, expect: 'beijing' },
-      { id: 'n5', x: 80, y: 70, expect: 'shangdian' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n3', to: 'n5' },
-    ],
-    pool: ['baba', 'mama', 'qu1', 'beijing', 'shangdian'],
-    answer:
-      "爸爸和妈妈去北京和商店。<br><span class='kor'>아빠와 엄마는 베이징과 상점에 간다.</span>",
-  },
-  {
-    level: 5,
-    title: '카시오페아',
-    nodes: [
-      { id: 'n1', x: 10, y: 20, expect: 'wo' },
-      { id: 'n2', x: 30, y: 80, expect: 'bu' },
-      { id: 'n3', x: 50, y: 30, expect: 'xihuan1' },
-      { id: 'n4', x: 70, y: 80, expect: 'he_v1' },
-      { id: 'n5', x: 90, y: 20, expect: 'cha' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['wo', 'bu', 'xihuan1', 'he_v1', 'cha'],
-    answer:
-      "我不喜欢喝茶。<br><span class='kor'>나는 차를 마시는 것을 좋아하지 않는다.</span>",
-  },
-  {
-    level: 6,
-    title: '왕관자리',
-    nodes: [
-      { id: 'n1', x: 10, y: 30, expect: 'gege' },
-      { id: 'n2', x: 30, y: 60, expect: 'bu' },
-      { id: 'n3', x: 50, y: 80, expect: 'kan1' },
-      { id: 'n4', x: 70, y: 60, expect: 'dianshi' },
-      { id: 'n5', x: 90, y: 30, expect: 'dianying' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['gege', 'bu', 'kan1', 'dianshi', 'dianying'],
-    answer:
-      "哥哥不看电视和电影。<br><span class='kor'>형은 TV와 영화를 보지 않는다.</span>",
-  },
-  {
-    level: 7,
-    title: '북두칠성',
-    nodes: [
-      { id: 'n1', x: 10, y: 30, expect: 'laoshi' },
-      { id: 'n2', x: 25, y: 40, expect: 'bu' },
-      { id: 'n3', x: 40, y: 50, expect: 'xihuan1' },
-      { id: 'n4', x: 55, y: 60, expect: 'he_v1' },
-      { id: 'n5', x: 75, y: 50, expect: 'pijiu' },
-      { id: 'n6', x: 65, y: 85, expect: 'kafei' },
-      { id: 'n7', x: 85, y: 80, expect: 'shui' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n4', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n7', to: 'n5' },
-    ],
-    pool: ['laoshi', 'bu', 'xihuan1', 'he_v1', 'pijiu', 'kafei', 'shui'],
-    answer:
-      "老师不喜欢喝啤酒、咖啡和水。<br><span class='kor'>선생님은 맥주, 커피, 물 마시는 것을 좋아하지 않는다.</span>",
-  },
-  {
-    level: 8,
-    title: '백조자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'pengyou' },
-      { id: 'n2', x: 50, y: 20, expect: 'baba' },
-      { id: 'n3', x: 50, y: 50, expect: 'mai1' },
-      { id: 'n4', x: 50, y: 80, expect: 'mama' },
-      { id: 'n5', x: 80, y: 50, expect: 'shu' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n4', to: 'n3' },
-      { from: 'n3', to: 'n5' },
-    ],
-    pool: ['pengyou', 'baba', 'mai1', 'mama', 'shu'],
-    answer:
-      "朋友、爸爸和妈妈买书。<br><span class='kor'>친구, 아빠, 엄마는 책을 산다.</span>",
-  },
-  {
-    level: 9,
-    title: '거문고자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 20, expect: 'ta' },
-      { id: 'n2', x: 40, y: 50, expect: 'ai' },
-      { id: 'n3', x: 60, y: 30, expect: 'kan1' },
-      { id: 'n4', x: 60, y: 70, expect: 'ting' },
-      { id: 'n5', x: 80, y: 50, expect: 'ge' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['ta', 'ai', 'kan1', 'ting', 'ge'],
-    answer:
-      "他爱看电影和听歌。<br><span class='kor'>그는 영화를 보고 노래 듣는 것을 사랑한다.</span>",
-  },
-  {
-    level: 10,
-    title: '오리온자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 20, expect: 'wo' },
-      { id: 'n2', x: 20, y: 80, expect: 'ta' },
-      { id: 'n3', x: 45, y: 50, expect: 'xihuan1' },
-      { id: 'n4', x: 65, y: 50, expect: 'chi1' },
-      { id: 'n5', x: 85, y: 20, expect: 'mianbao' },
-      { id: 'n6', x: 85, y: 80, expect: 'pingguo' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n4', to: 'n6' },
-    ],
-    pool: ['wo', 'ta', 'xihuan1', 'chi1', 'mianbao', 'pingguo'],
-    answer:
-      "我和他喜欢吃面包和苹果。<br><span class='kor'>나와 그는 빵과 사과 먹는 것을 좋아한다.</span>",
-  },
-  {
-    level: 11,
-    title: '세페우스자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'yeye' },
-      { id: 'n2', x: 50, y: 20, expect: 'qu1' },
-      { id: 'n3', x: 50, y: 80, expect: 'xihuan1' },
-      { id: 'n4', x: 80, y: 35, expect: 'jia' },
-      { id: 'n5', x: 80, y: 65, expect: 'cha' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['yeye', 'qu1', 'xihuan1', 'jia', 'cha'],
-    answer:
-      "爷爷去家，喜欢茶。<br><span class='kor'>할아버지는 집에 가고, 차를 좋아하신다.</span>",
-  },
-  {
-    level: 12,
-    title: '큰개자리',
-    nodes: [
-      { id: 'n1', x: 15, y: 30, expect: 'wo' },
-      { id: 'n2', x: 35, y: 50, expect: 'bu' },
-      { id: 'n3', x: 55, y: 30, expect: 'xihuan1' },
-      { id: 'n4', x: 55, y: 70, expect: 'chi1' },
-      { id: 'n5', x: 75, y: 50, expect: 'fan' },
-      { id: 'n6', x: 90, y: 30, expect: 'mian' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-    ],
-    pool: ['wo', 'bu', 'xihuan1', 'chi1', 'fan', 'mian'],
-    answer:
-      "我不喜欢吃饭和面。<br><span class='kor'>나는 밥과 면 먹는 것을 좋아하지 않는다.</span>",
-  },
-  {
-    level: 13,
-    title: '목동자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'didi' },
-      { id: 'n2', x: 40, y: 30, expect: 'mai1' },
-      { id: 'n3', x: 40, y: 70, expect: 'kan1' },
-      { id: 'n4', x: 60, y: 50, expect: 'shu' },
-      { id: 'n5', x: 80, y: 50, expect: 'dianshi' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['didi', 'mai1', 'kan1', 'shu', 'dianshi'],
-    answer:
-      "弟弟买书，看电视。<br><span class='kor'>남동생은 책을 사고, TV를 본다.</span>",
-  },
-  {
-    level: 14,
-    title: '마차부자리',
-    nodes: [
-      { id: 'n1', x: 15, y: 50, expect: 'meimei' },
-      { id: 'n2', x: 40, y: 20, expect: 'xihuan1' },
-      { id: 'n3', x: 40, y: 80, expect: 'bu' },
-      { id: 'n4', x: 70, y: 30, expect: 'shuo' },
-      { id: 'n5', x: 70, y: 70, expect: 'hanyu' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['meimei', 'xihuan1', 'bu', 'shuo', 'hanyu'],
-    answer:
-      "妹妹喜欢不说话。<br><span class='kor'>여동생은 중국어로 말하는 것을 좋아하지 않는다.</span>",
-  },
-  {
-    level: 15,
-    title: '페가수스자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 30, expect: 'wo' },
-      { id: 'n2', x: 20, y: 70, expect: 'ta' },
-      { id: 'n3', x: 50, y: 30, expect: 'ai' },
-      { id: 'n4', x: 50, y: 70, expect: 'kan1' },
-      { id: 'n5', x: 80, y: 50, expect: 'dianying' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n3' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n1', to: 'n4' },
-    ],
-    pool: ['wo', 'ta', 'ai', 'kan1', 'dianying'],
-    answer:
-      "我和他都爱看电影。<br><span class='kor'>나와 그는 모두 영화를 보는 것을 사랑한다.</span>",
-  },
-  {
-    level: 16,
-    title: '페르세우스자리',
-    nodes: [
-      { id: 'n1', x: 20, y: 50, expect: 'mama' },
-      { id: 'n2', x: 40, y: 50, expect: 'qu1' },
-      { id: 'n3', x: 60, y: 20, expect: 'shangdian' },
-      { id: 'n4', x: 80, y: 40, expect: 'mai1' },
-      { id: 'n5', x: 60, y: 80, expect: 'yiyuan' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n2', to: 'n5' },
-    ],
-    pool: ['mama', 'qu1', 'shangdian', 'mai1', 'yiyuan'],
-    answer:
-      "妈妈去商店买东西，去医院。<br><span class='kor'>엄마는 상점에 가서 물건을 사고, 병원에 간다.</span>",
-  },
-  {
-    level: 17,
-    title: '안드로메다자리',
-    nodes: [
-      { id: 'n1', x: 15, y: 50, expect: 'baba' },
-      { id: 'n2', x: 35, y: 50, expect: 'xihuan1' },
-      { id: 'n3', x: 60, y: 30, expect: 'he_v1' },
-      { id: 'n4', x: 85, y: 15, expect: 'pijiu' },
-      { id: 'n5', x: 60, y: 70, expect: 'chi1' },
-      { id: 'n6', x: 85, y: 85, expect: 'fan' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n2', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-    ],
-    pool: ['baba', 'xihuan1', 'he_v1', 'pijiu', 'chi1', 'fan'],
-    answer:
-      "爸爸喜欢喝啤酒和吃饭。<br><span class='kor'>아빠는 맥주 마시는 것과 밥 먹는 것을 좋아하신다.</span>",
-  },
-  {
-    level: 18,
-    title: '돌고래자리',
-    nodes: [
-      { id: 'n1', x: 15, y: 70, expect: 'gege' },
-      { id: 'n2', x: 35, y: 40, expect: 'bu' },
-      { id: 'n3', x: 55, y: 20, expect: 'qu1' },
-      { id: 'n4', x: 75, y: 40, expect: 'xuexiao' },
-      { id: 'n5', x: 55, y: 60, expect: 'beijing' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n2', to: 'n5' },
-    ],
-    pool: ['gege', 'bu', 'qu1', 'xuexiao', 'beijing'],
-    answer:
-      "哥哥不去学校和北京。<br><span class='kor'>형은 학교와 베이징에 가지 않는다.</span>",
-  },
-
-  // --- [19~30: 황도 12궁 - 화면 이탈 방지 좌표 최적화] ---
-  {
-    level: 19,
-    title: '양자리 (Aries)',
-    nodes: [
-      { id: 'n1', x: 20, y: 60, expect: 'wo' },
-      { id: 'n2', x: 50, y: 40, expect: 'jintian' },
-      { id: 'n3', x: 70, y: 45, expect: 'hen' },
-      { id: 'n4', x: 90, y: 60, expect: 'gaoxing' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-    ],
-    pool: ['wo', 'jintian', 'hen', 'gaoxing'],
-    answer: "我今天很高兴。<br><span class='kor'>나는 오늘 매우 기쁘다.</span>",
-  },
-  {
-    level: 20,
-    title: '황소자리 (Taurus)',
-    nodes: [
-      { id: 'n1', x: 15, y: 35, expect: 'baba' },
-      { id: 'n2', x: 10, y: 50, expect: 'he_conj1' },
-      { id: 'n3', x: 15, y: 65, expect: 'mama' },
-      { id: 'n4', x: 25, y: 55, expect: 'jintian' },
-      { id: 'n5', x: 25, y: 45, expect: 'dou' },
-      { id: 'n6', x: 40, y: 20, expect: 'qu1' },
-      { id: 'n7', x: 60, y: 15, expect: 'shangdian' },
-      { id: 'n8', x: 80, y: 20, expect: 'mai1' },
-      { id: 'n9', x: 40, y: 80, expect: 'xihuan1' },
-      { id: 'n10', x: 60, y: 85, expect: 'he_v1' },
-      { id: 'n11', x: 80, y: 80, expect: 'kafei' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n3', to: 'n2' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n1', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n7', to: 'n8' },
-      { from: 'n4', to: 'n9' },
-      { from: 'n9', to: 'n10' },
-      { from: 'n10', to: 'n11' },
-    ],
-    pool: [
-      'baba',
-      'he_conj1',
-      'mama',
-      'jintian',
-      'dou',
-      'qu1',
-      'shangdian',
-      'mai1',
-      'xihuan1',
-      'he_v1',
-      'kafei',
-    ],
-    answer:
-      "爸爸和妈妈今天都去商店买东西，喜欢喝咖啡。<br><span class='kor'>아빠와 엄마는 오늘 모두 상점에 사고, 커피 마시기를 좋아하신다.</span>",
-  },
-  {
-    level: 21,
-    title: '쌍둥이자리 (Gemini)',
-    nodes: [
-      { id: 'n1', x: 25, y: 15, expect: 'yinwei' },
-      { id: 'n2', x: 25, y: 30, expect: 'wo' },
-      { id: 'n3', x: 25, y: 50, expect: 'de' },
-      { id: 'n4', x: 15, y: 70, expect: 'gege' },
-      { id: 'n5', x: 10, y: 85, expect: 'he_conj1' },
-      { id: 'n6', x: 35, y: 70, expect: 'jiejie' },
-      { id: 'n7', x: 40, y: 85, expect: 'jintian' },
-      { id: 'n8', x: 10, y: 45, expect: 'hen' },
-      { id: 'n9', x: 40, y: 45, expect: 'mang' },
-      { id: 'n10', x: 75, y: 15, expect: 'suoyi' },
-      { id: 'n11', x: 75, y: 30, expect: 'ta' },
-      { id: 'n12', x: 75, y: 50, expect: 'men' },
-      { id: 'n13', x: 65, y: 70, expect: 'bu' },
-      { id: 'n14', x: 60, y: 85, expect: 'qu1' },
-      { id: 'n15', x: 85, y: 70, expect: 'xuexiao' },
-      { id: 'n16', x: 90, y: 85, expect: 'xuexi' },
-      { id: 'n17', x: 60, y: 45, expect: 'hanyu' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n3', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n2', to: 'n8' },
-      { from: 'n2', to: 'n9' },
-      { from: 'n10', to: 'n11' },
-      { from: 'n11', to: 'n12' },
-      { from: 'n12', to: 'n13' },
-      { from: 'n13', to: 'n14' },
-      { from: 'n12', to: 'n15' },
-      { from: 'n15', to: 'n16' },
-      { from: 'n11', to: 'n17' },
-      { from: 'n9', to: 'n17' },
-    ],
-    pool: [
-      'yinwei',
-      'wo',
-      'de',
-      'gege',
-      'he_conj1',
-      'jiejie',
-      'jintian',
-      'hen',
-      'mang',
-      'suoyi',
-      'ta',
-      'men',
-      'bu',
-      'qu1',
-      'xuexiao',
-      'xuexi',
-      'hanyu',
-    ],
-    answer:
-      "因为我的哥哥和姐姐今天很忙，所以他们不去学校学习汉语。<br><span class='kor'>나의 형과 누나가 오늘 바빠서, 그들은 학교에 중국어를 배우러 가지 않는다.</span>",
-  },
-  {
-    level: 22,
-    title: '게자리 (Cancer)',
-    nodes: [
-      { id: 'n1', x: 50, y: 50, expect: 'wo' },
-      { id: 'n2', x: 50, y: 20, expect: 'jintian' },
-      { id: 'n3', x: 30, y: 80, expect: 'bu' },
-      { id: 'n4', x: 70, y: 80, expect: 'kan1' },
-      { id: 'n5', x: 90, y: 60, expect: 'dianying' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n1', to: 'n3' },
-      { from: 'n1', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-    ],
-    pool: ['wo', 'jintian', 'bu', 'kan1', 'dianying'],
-    answer:
-      "我今天不看电影。<br><span class='kor'>나는 오늘 영화를 안 본다.</span>",
-  },
-  {
-    level: 23,
-    title: '사자자리 (Leo)',
-    nodes: [
-      { id: 'n1', x: 10, y: 60, expect: 'ta' },
-      { id: 'n2', x: 15, y: 35, expect: 'jintian' },
-      { id: 'n3', x: 30, y: 20, expect: 'zai' },
-      { id: 'n4', x: 45, y: 30, expect: 'jia' },
-      { id: 'n5', x: 40, y: 55, expect: 'hen' },
-      { id: 'n6', x: 25, y: 70, expect: 'gaoxing' },
-      { id: 'n7', x: 70, y: 45, expect: 'de' },
-      { id: 'n8', x: 85, y: 70, expect: 'kan1' },
-      { id: 'n9', x: 55, y: 85, expect: 'dianshi' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n5', to: 'n7' },
-      { from: 'n7', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n9', to: 'n6' },
-    ],
-    pool: [
-      'ta',
-      'jintian',
-      'zai',
-      'jia',
-      'hen',
-      'gaoxing',
-      'de',
-      'kan1',
-      'dianshi',
-    ],
-    answer:
-      "他今天在家很高兴地看电视。<br><span class='kor'>그는 오늘 집에서 매우 기쁘게 TV를 본다.</span>",
-  },
-  {
-    level: 24,
-    title: '처녀자리 (Virgo)',
-    nodes: [
-      { id: 'n1', x: 15, y: 20, expect: 'wo' },
-      { id: 'n2', x: 30, y: 35, expect: 'he_conj1' },
-      { id: 'n3', x: 50, y: 30, expect: 'pengyou' },
-      { id: 'n4', x: 60, y: 50, expect: 'jintian' },
-      { id: 'n5', x: 40, y: 60, expect: 'dou' },
-      { id: 'n6', x: 75, y: 45, expect: 'hen' },
-      { id: 'n7', x: 88, y: 30, expect: 'xihuan1' },
-      { id: 'n8', x: 35, y: 80, expect: 'qu1' },
-      { id: 'n9', x: 45, y: 90, expect: 'zhongguo' },
-      { id: 'n10', x: 55, y: 80, expect: 'chi1' },
-      { id: 'n11', x: 85, y: 60, expect: 'hao' },
-      { id: 'n12', x: 75, y: 80, expect: 'de' },
-      { id: 'n13', x: 90, y: 90, expect: 'mian' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n5', to: 'n2' },
-      { from: 'n4', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n5', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n5', to: 'n10' },
-      { from: 'n4', to: 'n11' },
-      { from: 'n11', to: 'n12' },
-      { from: 'n12', to: 'n13' },
-    ],
-    pool: [
-      'wo',
-      'he_conj1',
-      'pengyou',
-      'jintian',
-      'dou',
-      'hen',
-      'xihuan1',
-      'qu1',
-      'zhongguo',
-      'chi1',
-      'hao',
-      'de',
-      'mian',
-    ],
-    answer:
-      "我和朋友今天都很喜欢去中国吃好的面。<br><span class='kor'>나와 친구는 오늘 모두 중국에 가서 맛있는 면을 먹는 것을 아주 좋아한다.</span>",
-  },
-  {
-    level: 25,
-    title: '천칭자리 (Libra)',
-    nodes: [
-      { id: 'n1', x: 30, y: 70, expect: 'wo' },
-      { id: 'n2', x: 50, y: 40, expect: 'mingtian' },
-      { id: 'n3', x: 70, y: 50, expect: 'qu1' },
-      { id: 'n4', x: 60, y: 80, expect: 'shangdian' },
-      { id: 'n5', x: 45, y: 15, expect: 'mai1' },
-      { id: 'n6', x: 90, y: 35, expect: 'shui' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n1' },
-      { from: 'n2', to: 'n5' },
-      { from: 'n3', to: 'n6' },
-    ],
-    pool: ['wo', 'mingtian', 'qu1', 'shangdian', 'mai1', 'shui'],
-    answer:
-      "我明天去商店买水。<br><span class='kor'>나는 내일 상점에 물을 사러 간다.</span>",
-  },
-  {
-    level: 26,
-    title: '전갈자리 (Scorpio)',
-    nodes: [
-      { id: 'n1', x: 10, y: 20, expect: 'wo' },
-      { id: 'n2', x: 15, y: 40, expect: 'de' },
-      { id: 'n3', x: 10, y: 60, expect: 'yeye' },
-      { id: 'n4', x: 30, y: 40, expect: 'he_conj1' },
-      { id: 'n5', x: 45, y: 50, expect: 'nainai' },
-      { id: 'n6', x: 55, y: 60, expect: 'dou' },
-      { id: 'n7', x: 60, y: 75, expect: 'bu' },
-      { id: 'n8', x: 65, y: 90, expect: 'xihuan1' },
-      { id: 'n9', x: 75, y: 90, expect: 'qu1' },
-      { id: 'n10', x: 85, y: 85, expect: 'shangdian' },
-      { id: 'n11', x: 88, y: 70, expect: 'mai1' },
-      { id: 'n12', x: 85, y: 55, expect: 'pingguo' },
-      { id: 'n13', x: 75, y: 50, expect: 'he_conj2' },
-      { id: 'n14', x: 80, y: 35, expect: 'mianbao' },
-      { id: 'n15', x: 92, y: 35, expect: 'le' }, // 좌표 안쪽으로
-    ],
-    paths: [
-      { from: 'n1', to: 'n4' },
-      { from: 'n2', to: 'n4' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n7', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n9', to: 'n10' },
-      { from: 'n10', to: 'n11' },
-      { from: 'n11', to: 'n12' },
-      { from: 'n12', to: 'n13' },
-      { from: 'n13', to: 'n14' },
-      { from: 'n14', to: 'n15' },
-    ],
-    pool: [
-      'wo',
-      'de',
-      'yeye',
-      'he_conj1',
-      'nainai',
-      'dou',
-      'bu',
-      'xihuan1',
-      'qu1',
-      'shangdian',
-      'mai1',
-      'pingguo',
-      'he_conj2',
-      'mianbao',
-      'le',
-    ],
-    answer:
-      "我的爷爷和奶奶都不喜欢去商店买苹果和面包了。<br><span class='kor'>나의 조부모님은 모두 상점에 가서 사과와 빵을 사는 것을 좋아하시지 않게 되었다.</span>",
-  },
-  {
-    level: 27,
-    title: '사수자리 (Sagittarius)',
-    nodes: [
-      { id: 'n1', x: 10, y: 40, expect: 'laoshi' },
-      { id: 'n2', x: 15, y: 20, expect: 'jintian' },
-      { id: 'n3', x: 35, y: 25, expect: 'qu1' },
-      { id: 'n4', x: 35, y: 50, expect: 'beijing' },
-      { id: 'n5', x: 50, y: 15, expect: 'suoyi' },
-      { id: 'n6', x: 65, y: 25, expect: 'wo' },
-      { id: 'n7', x: 55, y: 50, expect: 'men' },
-      { id: 'n8', x: 65, y: 80, expect: 'zai' },
-      { id: 'n9', x: 25, y: 80, expect: 'jia' },
-      { id: 'n10', x: 80, y: 40, expect: 'kan1' },
-      { id: 'n11', x: 92, y: 30, expect: 'dianshi' },
-      { id: 'n12', x: 85, y: 75, expect: 'ting' },
-      { id: 'n13', x: 95, y: 85, expect: 'ge' },
-      { id: 'n14', x: 85, y: 60, expect: 'le' },
-      { id: 'n15', x: 90, y: 65, expect: 'ba' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n1' },
-      { from: 'n4', to: 'n7' },
-      { from: 'n7', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n9', to: 'n1' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n7', to: 'n10' },
-      { from: 'n10', to: 'n11' },
-      { from: 'n8', to: 'n12' },
-      { from: 'n12', to: 'n13' },
-      { from: 'n8', to: 'n14' },
-      { from: 'n14', to: 'n15' },
-    ],
-    pool: [
-      'laoshi',
-      'jintian',
-      'qu1',
-      'beijing',
-      'suoyi',
-      'wo',
-      'men',
-      'zai',
-      'jia',
-      'kan1',
-      'dianshi',
-      'ting',
-      'ge',
-      'le',
-      'ba',
-    ],
-    answer:
-      "老师今天去北京，所以我们在家看电视、听歌了吧。<br><span class='kor'>선생님이 오늘 베이징에 가셔서, 우리는 집에서 TV를 보고 노래를 들었을 것이다.</span>",
-  },
-  {
-    level: 28,
-    title: '염소자리 (Capricorn)',
-    nodes: [
-      { id: 'n1', x: 15, y: 20, expect: 'baba' },
-      { id: 'n2', x: 30, y: 35, expect: 'he_conj1' },
-      { id: 'n3', x: 50, y: 55, expect: 'mama' },
-      { id: 'n4', x: 60, y: 75, expect: 'mingtian' },
-      { id: 'n5', x: 75, y: 85, expect: 'qu1' },
-      { id: 'n6', x: 90, y: 65, expect: 'yiyuan' },
-      { id: 'n7', x: 80, y: 45, expect: 'kan1' },
-      { id: 'n8', x: 60, y: 35, expect: 'yisheng' },
-      { id: 'n9', x: 45, y: 25, expect: 'wo' },
-      { id: 'n10', x: 25, y: 15, expect: 'bu' },
-      { id: 'n11', x: 10, y: 30, expect: 'qu2' },
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n7', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n9', to: 'n10' },
-      { from: 'n10', to: 'n11' },
-      { from: 'n11', to: 'n1' },
-    ],
-    pool: [
-      'baba',
-      'he_conj1',
-      'mama',
-      'mingtian',
-      'qu1',
-      'yiyuan',
-      'kan1',
-      'yisheng',
-      'wo',
-      'bu',
-      'qu2',
-    ],
-    answer:
-      "爸爸和妈妈明天去医院看医生，我不去。<br><span class='kor'>아빠와 엄마는 내일 병원에 의사를 보러 가고, 나는 가지 않는다.</span>",
-  },
-  {
-    level: 29,
-    title: '물병자리 (Aquarius)',
-    nodes: [
-      { id: 'n1', x: 20, y: 20, expect: 'didi' },
-      { id: 'n2', x: 35, y: 15, expect: 'he_conj1' },
-      { id: 'n3', x: 45, y: 30, expect: 'meimei' },
-      { id: 'n4', x: 30, y: 40, expect: 'he_conj2' },
-      { id: 'n5', x: 60, y: 40, expect: 'wo' },
-      { id: 'n6', x: 75, y: 30, expect: 'dou' },
-      { id: 'n7', x: 90, y: 45, expect: 'hen' },
-      { id: 'n8', x: 40, y: 60, expect: 'xihuan1' },
-      { id: 'n9', x: 55, y: 55, expect: 'he_v1' },
-      { id: 'n10', x: 75, y: 75, expect: 'shui' },
-      { id: 'n11', x: 90, y: 65, expect: 'ye' },
-      { id: 'n12', x: 90, y: 85, expect: 'xihuan2' },
-      { id: 'n13', x: 80, y: 88, expect: 'cha' }, // 좌표 안쪽으로 이동
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n1' },
-      { from: 'n3', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n6', to: 'n7' },
-      { from: 'n4', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n9', to: 'n10' },
-      { from: 'n10', to: 'n11' },
-      { from: 'n11', to: 'n12' },
-      { from: 'n12', to: 'n13' },
-    ],
-    pool: [
-      'didi',
-      'he_conj1',
-      'meimei',
-      'he_conj2',
-      'wo',
-      'dou',
-      'hen',
-      'xihuan1',
-      'he_v1',
-      'shui',
-      'ye',
-      'xihuan2',
-      'cha',
-    ],
-    answer:
-      "弟弟、妹妹和我都喜欢喝水，也喜欢喝茶。<br><span class='kor'>남동생, 여동생과 나는 모두 물 마시는 것을 매우 좋아하고, 차 마시는 것도 좋아한다.</span>",
-  },
-  {
-    level: 30,
-    title: '물고기자리 (Pisces)',
-    nodes: [
-      { id: 'n1', x: 10, y: 30, expect: 'wo' },
-      { id: 'n2', x: 15, y: 15, expect: 'de' },
-      { id: 'n3', x: 25, y: 20, expect: 'baba' },
-      { id: 'n4', x: 35, y: 35, expect: 'he_conj1' },
-      { id: 'n5', x: 25, y: 50, expect: 'mama' },
-      { id: 'n6', x: 15, y: 45, expect: 'dou' },
-      { id: 'n7', x: 45, y: 50, expect: 'hen' },
-      { id: 'n8', x: 55, y: 65, expect: 'xihuan1' },
-      { id: 'n9', x: 65, y: 80, expect: 'chi1' },
-      { id: 'n10', x: 75, y: 60, expect: 'pingguo' },
-      { id: 'n11', x: 85, y: 45, expect: 'he_conj2' },
-      { id: 'n12', x: 88, y: 35, expect: 'mianbao' },
-      { id: 'n13', x: 78, y: 20, expect: 'yinwei' },
-      { id: 'n14', x: 85, y: 10, expect: 'ye' },
-      { id: 'n15', x: 95, y: 15, expect: 'hao' },
-      { id: 'n16', x: 95, y: 28, expect: 'chi2' },
-      { id: 'n17', x: 88, y: 45, expect: 'le' }, // 화면 안쪽으로 모음
-    ],
-    paths: [
-      { from: 'n1', to: 'n2' },
-      { from: 'n2', to: 'n3' },
-      { from: 'n3', to: 'n4' },
-      { from: 'n4', to: 'n5' },
-      { from: 'n5', to: 'n6' },
-      { from: 'n6', to: 'n1' },
-      { from: 'n4', to: 'n7' },
-      { from: 'n7', to: 'n8' },
-      { from: 'n8', to: 'n9' },
-      { from: 'n9', to: 'n10' },
-      { from: 'n10', to: 'n11' },
-      { from: 'n11', to: 'n12' },
-      { from: 'n12', to: 'n13' },
-      { from: 'n13', to: 'n14' },
-      { from: 'n14', to: 'n15' },
-      { from: 'n15', to: 'n16' },
-      { from: 'n16', to: 'n17' },
-      { from: 'n17', to: 'n12' },
-    ],
-    pool: [
-      'wo',
-      'de',
-      'baba',
-      'he_conj1',
-      'mama',
-      'dou',
-      'hen',
-      'xihuan1',
-      'chi1',
-      'pingguo',
-      'he_conj2',
-      'mianbao',
-      'yinwei',
-      'ye',
-      'hao',
-      'chi2',
-      'le',
-    ],
-    answer:
-      "我的爸爸和妈妈都很喜欢吃苹果和面包，因为也很好吃了。<br><span class='kor'>나의 아빠와 엄마는 모두 사과와 빵을 먹는 것을 좋아하신다. 왜냐하면 역시 맛있어졌기 때문이다.</span>",
-  },
-];
-
-/**
- * [4. 로직: 진척도 및 로비 관리]
- */
-function getClearedStages() {
-  const saved = localStorage.getItem('chineseConstellationProgress');
-  return saved ? JSON.parse(saved) : [];
+:root {
+  --neon-green: #00e676;
+  --neon-blue: #2979ff;
+  --bg-dark: #090a0f;
 }
 
-function saveStageClear(idx) {
-  let cleared = getClearedStages();
-  if (!cleared.includes(idx)) {
-    cleared.push(idx);
-    localStorage.setItem(
-      'chineseConstellationProgress',
-      JSON.stringify(cleared),
-    );
+body {
+  margin: 0;
+  background: var(--bg-dark);
+  font-family: 'Pretendard', sans-serif;
+  overflow: hidden;
+  color: white;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+#lobby-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+  overflow-y: auto;
+}
+.lobby-header {
+  text-align: center;
+  margin: 50px 0 30px;
+  padding: 0 20px;
+}
+.lobby-header h1 {
+  font-size: 42px;
+  color: var(--neon-blue);
+  text-shadow: 0 0 15px var(--neon-blue);
+  margin-bottom: 10px;
+}
+#stage-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  max-width: 600px;
+  padding: 0 20px 50px;
+}
+.stage-btn {
+  width: 65px;
+  height: 65px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.stage-btn.completed {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
+}
+
+#game-screen {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+#play-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 170px);
+} /* 하단 공간 더 확보 */
+#constellation-svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.path {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 3;
+  fill: none;
+  transition:
+    stroke 0.5s,
+    stroke-width 0.5s;
+  stroke-dasharray: 10 10;
+  animation: flowPath 1.5s linear infinite;
+}
+.path.active {
+  stroke: var(--neon-green);
+  stroke-width: 4;
+  filter: drop-shadow(0 0 8px var(--neon-green));
+  stroke-dasharray: 15 10;
+  animation: flowPath 0.8s linear infinite;
+}
+
+/* --- [대화문 전용 선(Path) 다중 색상 스타일] --- */
+
+/* A 문장 선 (붉은색) */
+.path.path-a {
+  stroke: rgba(255, 138, 128, 0.3);
+}
+.path.path-a.active {
+  stroke: #ff5252;
+  filter: drop-shadow(0 0 8px #ff5252);
+}
+
+/* B 문장 선 (황금색) */
+.path.path-b {
+  stroke: rgba(255, 213, 79, 0.3);
+}
+.path.path-b.active {
+  stroke: #ffc107;
+  filter: drop-shadow(0 0 8px #ffc107);
+}
+
+/* A/B 공통 선 (보라색) */
+.path.path-common {
+  stroke: rgba(225, 190, 231, 0.3);
+}
+.path.path-common.active {
+  stroke: #ba68c8;
+  filter: drop-shadow(0 0 8px #ba68c8);
+}
+
+@keyframes flowPath {
+  to {
+    stroke-dashoffset: -40;
   }
 }
 
-function createLobby() {
-  const grid = document.getElementById('stage-grid');
-  grid.innerHTML = '';
-  const cleared = getClearedStages();
+/* [수정됨] 정거장(노드) 크기를 약간 줄여 겹침 방지 */
+.node {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(5px);
+  z-index: 2;
+}
+.node.highlight {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 20px var(--neon-green);
+}
 
-  for (let i = 0; i < TOTAL_STAGES; i++) {
-    const btn = document.createElement('button');
-    btn.className = 'stage-btn';
-    if (cleared.includes(i)) {
-      btn.classList.add('completed');
-      btn.innerText = '✔';
-    } else {
-      btn.innerText = i + 1;
-    }
-    if (STAGES[i]) btn.onclick = () => startStage(i);
-    grid.appendChild(btn);
+.hint-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+.node.start-node {
+  border-color: rgba(41, 121, 255, 0.6);
+  background: rgba(41, 121, 255, 0.1);
+  box-shadow: inset 0 0 10px rgba(41, 121, 255, 0.3);
+}
+.node.filled .hint-text {
+  display: none;
+}
+
+/* [수정됨] 단어 타일 크기 축소하여 가독성과 공간 확보 */
+.star-tile {
+  width: 75px;
+  height: 75px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  z-index: 3;
+}
+.star-tile .hanzi {
+  font-size: 34px;
+  font-weight: bold;
+  color: #fff;
+}
+.star-tile .pinyin {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+/* [수정됨] Word Dock 스크롤 최적화 및 최대 높이 증가 */
+#word-dock {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 900px;
+  min-height: 90px;
+  max-height: 200px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  backdrop-filter: blur(15px);
+  padding: 15px 10px;
+  overflow-y: auto;
+  z-index: 10;
+}
+/* 스크롤바 예쁘게 커스텀 */
+#word-dock::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+#word-dock::-webkit-scrollbar-thumb {
+  background: rgba(0, 230, 118, 0.5);
+  border-radius: 10px;
+}
+#word-dock::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#dock-inner {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 5px;
+}
+
+.star-tile.dragging {
+  opacity: 0.9;
+  transform: scale(1.15);
+  z-index: 2000;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+.star-tile.locked {
+  background: var(--neon-blue);
+  box-shadow: 0 0 15px var(--neon-blue);
+  cursor: default;
+}
+
+#header {
+  position: absolute;
+  top: 15px;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+  z-index: 100;
+}
+#stage-num {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-blue);
+  line-height: 1.2;
+}
+#mission-desc {
+  margin-top: 5px;
+  opacity: 0.7;
+  font-size: 14px;
+}
+.back-btn {
+  position: absolute;
+  left: 15px;
+  top: 0;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+#victory-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.popup {
+  text-align: center;
+  border: 1px solid var(--neon-green);
+  padding: 30px 20px;
+  border-radius: 30px;
+  background: #0a0f1e;
+  width: 85%;
+  max-width: 500px;
+}
+.popup h2 {
+  margin-top: 0;
+  color: #fff;
+}
+
+.victory-answer {
+  margin: 25px auto;
+  padding: 20px;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid var(--neon-green);
+  border-radius: 20px;
+  font-size: 24px;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: inset 0 0 15px rgba(0, 230, 118, 0.2);
+  line-height: 1.4;
+}
+.victory-answer .kor {
+  display: block;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 10px;
+  font-weight: normal;
+}
+.popup button {
+  margin: 10px 5px;
+  padding: 12px 25px;
+  border-radius: 25px;
+  border: none;
+  background: var(--neon-green);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}
+.hidden {
+  display: none !important;
+}
+
+/* 모바일 전용 반응형 한층 더 최적화 */
+@media (max-width: 768px) {
+  .lobby-header h1 {
+    font-size: 28px;
+  }
+  #stage-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .stage-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+
+  .node {
+    width: 55px;
+    height: 55px;
+  }
+  .star-tile {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+  }
+  .star-tile .hanzi {
+    font-size: 28px;
+  }
+  .star-tile .pinyin {
+    font-size: 11px;
+  }
+  .hint-text {
+    font-size: 12px;
+  }
+
+  #word-dock {
+    max-height: 180px;
+  }
+  #header {
+    top: 10px;
+  }
+  #stage-num {
+    font-size: 18px;
+  }
+  .back-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  .victory-answer {
+    font-size: 18px;
+    padding: 15px;
+  }
+  .victory-answer .kor {
+    font-size: 13px;
   }
 }
 
-function showLobby() {
-  document.getElementById('game-screen').classList.add('hidden');
-  document.getElementById('lobby-screen').classList.remove('hidden');
-  clearAllTiles();
-  createLobby();
+/* --- [대화문 전용 A/B 시작점 스타일] --- */
+
+/* A 시작점 (붉은색 계열) */
+.node.start-a {
+  border-color: rgba(255, 82, 82, 0.8);
+  background: rgba(255, 82, 82, 0.15);
+  box-shadow: inset 0 0 15px rgba(255, 82, 82, 0.4);
+}
+.hint-text.hint-a {
+  color: rgba(255, 138, 128, 0.9);
+  font-size: 15px;
+  text-shadow: 0 0 8px rgba(255, 82, 82, 0.5);
 }
 
-function startStage(idx) {
-  currentStageIdx = idx;
-  document.getElementById('lobby-screen').classList.add('hidden');
-  document.getElementById('game-screen').classList.remove('hidden');
-  initStage(idx);
+/* B 시작점 (황금색 계열) */
+.node.start-b {
+  border-color: rgba(255, 193, 7, 0.8);
+  background: rgba(255, 193, 7, 0.15);
+  box-shadow: inset 0 0 15px rgba(255, 193, 7, 0.4);
+}
+.hint-text.hint-b {
+  color: rgba(255, 213, 79, 0.9);
+  font-size: 15px;
+  text-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
 }
 
-/**
- * [5. 로직: 메인 게임 엔진]
- */
-function clearAllTiles() {
-  document.getElementById('node-container').innerHTML = '';
-  document.getElementById('constellation-svg').innerHTML = '';
-  document.getElementById('dock-inner').innerHTML = '';
-  document.querySelectorAll('.star-tile').forEach((t) => t.remove());
+/* [NEW] A/B 공통 시작점 (보라색 계열 - 붉은색+황금색의 조화) */
+.node.start-common {
+  border-color: rgba(186, 104, 200, 0.8);
+  background: rgba(186, 104, 200, 0.15);
+  box-shadow: inset 0 0 15px rgba(186, 104, 200, 0.4);
 }
-
-function initStage(idx) {
-  const stage = STAGES[idx];
-  if (!stage) return;
-
-  clearAllTiles();
-
-  const titleText = stage.title
-    ? `STAGE ${idx + 1}<br><span style="font-size:16px; opacity:0.8;">${stage.title}</span>`
-    : `STAGE ${String(idx + 1).padStart(2, '0')}`;
-  document.getElementById('stage-num').innerHTML = titleText;
-  document.getElementById('victory-overlay').classList.add('hidden');
-
-  // 힌트 판단 로직: 화살표를 받지 않으면 시작점! (원형 루프면 n1을 강제로 시작점으로)
-  const hasAnyStart = stage.nodes.some(
-    (node) => !stage.paths.some((p) => p.to === node.id),
-  );
-
-  stage.nodes.forEach((n) => {
-    const div = document.createElement('div');
-    div.className = 'node';
-    div.style.left = n.x + '%';
-    div.style.top = n.y + '%';
-    div.dataset.id = n.id;
-
-    let isStartNode = !stage.paths.some((p) => p.to === n.id);
-    if (!hasAnyStart && n.id === 'n1') isStartNode = true;
-
-    if (isStartNode) {
-      div.classList.add('start-node');
-      div.innerHTML = '<span class="hint-text">시작</span>';
-    }
-
-    document.getElementById('node-container').appendChild(div);
-  });
-
-  const svg = document.getElementById('constellation-svg');
-  svg.innerHTML = `
-        <defs>
-            <marker id="arrow-default" markerUnits="userSpaceOnUse" viewBox="0 0 10 10" refX="40" refY="5" markerWidth="14" markerHeight="14" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255, 255, 255, 0.4)" />
-            </marker>
-            <marker id="arrow-active" markerUnits="userSpaceOnUse" viewBox="0 0 10 10" refX="40" refY="5" markerWidth="14" markerHeight="14" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#00e676" style="filter: drop-shadow(0 0 3px #00e676);" />
-            </marker>
-        </defs>
-    `;
-
-  stage.paths.forEach((p) => {
-    const from = stage.nodes.find((n) => n.id === p.from);
-    const to = stage.nodes.find((n) => n.id === p.to);
-    if (from && to) {
-      const line = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'line',
-      );
-      line.setAttribute('x1', from.x + '%');
-      line.setAttribute('y1', from.y + '%');
-      line.setAttribute('x2', to.x + '%');
-      line.setAttribute('y2', to.y + '%');
-      line.setAttribute('id', `l-${p.from}-${p.to}`);
-      line.setAttribute('class', 'path');
-      line.setAttribute('marker-end', 'url(#arrow-default)');
-      svg.appendChild(line);
-    }
-  });
-
-  const shuffledPool = [...stage.pool].sort(() => Math.random() - 0.5);
-
-  shuffledPool.forEach((id) => {
-    const data = TILE_DATA[id];
-    if (!data) return;
-    const tile = document.createElement('div');
-    tile.className = 'star-tile';
-    tile.innerHTML = `<span class="hanzi">${data.hanzi}</span><span class="pinyin">${data.pinyin}</span>`;
-    tile.dataset.id = id;
-    makeDraggable(tile);
-    document.getElementById('dock-inner').appendChild(tile);
-  });
+.hint-text.hint-common {
+  color: rgba(225, 190, 231, 1);
+  font-size: 14px;
+  text-shadow: 0 0 8px rgba(186, 104, 200, 0.6);
 }
-
-function makeDraggable(tile) {
-  let offsetX, offsetY;
-
-  function startDrag(e) {
-    if (tile.classList.contains('locked')) return;
-    tile.classList.add('dragging');
-
-    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-
-    const rect = tile.getBoundingClientRect();
-    offsetX = clientX - rect.left;
-    offsetY = clientY - rect.top;
-
-    tile.style.position = 'fixed';
-    tile.style.left = rect.left + 'px';
-    tile.style.top = rect.top + 'px';
-    document.body.appendChild(tile);
-
-    if (e.type.includes('touch')) {
-      document.addEventListener('touchmove', onDrag, { passive: false });
-      document.addEventListener('touchend', endDrag);
-    } else {
-      document.addEventListener('mousemove', onDrag);
-      document.addEventListener('mouseup', endDrag);
-    }
-  }
-
-  function onDrag(e) {
-    if (e.type.includes('touch')) e.preventDefault();
-    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-
-    tile.style.left = clientX - offsetX + 'px';
-    tile.style.top = clientY - offsetY + 'px';
-    checkHover(tile);
-  }
-
-  function endDrag(e) {
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', endDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', endDrag);
-
-    tile.classList.remove('dragging');
-    if (!trySnap(tile)) {
-      tile.style.position = 'static';
-      tile.style.transform = 'none';
-      document.getElementById('dock-inner').appendChild(tile);
-    }
-  }
-
-  tile.addEventListener('mousedown', startDrag);
-  tile.addEventListener('touchstart', startDrag, { passive: false });
-  tile.ondragstart = () => false;
-}
-
-function checkHover(tile) {
-  const tRect = tile.getBoundingClientRect();
-  const tx = tRect.left + tRect.width / 2;
-  const ty = tRect.top + tRect.height / 2;
-  document.querySelectorAll('.node').forEach((node) => {
-    const nRect = node.getBoundingClientRect();
-    const dist = Math.hypot(
-      tx - (nRect.left + nRect.width / 2),
-      ty - (nRect.top + nRect.height / 2),
-    );
-    if (dist < 50 && !node.classList.contains('filled'))
-      node.classList.add('highlight');
-    else node.classList.remove('highlight');
-  });
-}
-
-function trySnap(tile) {
-  const tRect = tile.getBoundingClientRect();
-  const tx = tRect.left + tRect.width / 2;
-  const ty = tRect.top + tRect.height / 2;
-  let snapped = false;
-
-  document.querySelectorAll('.node').forEach((node) => {
-    if (snapped || node.classList.contains('filled')) return;
-    const nRect = node.getBoundingClientRect();
-    const dist = Math.hypot(
-      tx - (nRect.left + nRect.width / 2),
-      ty - (nRect.top + nRect.height / 2),
-    );
-
-    if (dist < 40) {
-      // 축소된 크기에 맞춰 자석 범위 조정
-      const stage = STAGES[currentStageIdx];
-      const nodeData = stage.nodes.find((n) => n.id === node.dataset.id);
-
-      const expectedHanzi = TILE_DATA[nodeData.expect].hanzi;
-      const tileHanzi = TILE_DATA[tile.dataset.id].hanzi;
-
-      if (expectedHanzi === tileHanzi) {
-        node.classList.remove('highlight');
-        node.classList.add('filled');
-        tile.classList.add('locked');
-        tile.style.left = nRect.left + nRect.width / 2 + 'px';
-        tile.style.top = nRect.top + nRect.height / 2 + 'px';
-        tile.style.transform = 'translate(-50%, -50%)';
-        snapped = true;
-        updatePaths();
-        checkVictory();
-      }
-    }
-  });
-  return snapped;
-}
-
-function updatePaths() {
-  STAGES[currentStageIdx].paths.forEach((p) => {
-    const fromNode = document.querySelector(`.node[data-id="${p.from}"]`);
-    const toNode = document.querySelector(`.node[data-id="${p.to}"]`);
-    if (
-      fromNode &&
-      toNode &&
-      fromNode.classList.contains('filled') &&
-      toNode.classList.contains('filled')
-    ) {
-      const line = document.getElementById(`l-${p.from}-${p.to}`);
-      if (line) {
-        line.classList.add('active');
-        line.setAttribute('marker-end', 'url(#arrow-active)');
-      }
-    }
-  });
-}
-
-function checkVictory() {
-  const total = STAGES[currentStageIdx].nodes.length;
-  const filled = document.querySelectorAll('.node.filled').length;
-  if (total === filled) {
-    saveStageClear(currentStageIdx);
-
-    const stage = STAGES[currentStageIdx];
-    const answerDiv = document.getElementById('victory-answer');
-    if (answerDiv) {
-      answerDiv.innerHTML = stage.answer || '완성된 문장입니다!';
-    }
-
-    setTimeout(
-      () =>
-        document.getElementById('victory-overlay').classList.remove('hidden'),
-      500,
-    );
-  }
-}
-
-function loadNextStage() {
-  if (currentStageIdx < STAGES.length - 1) {
-    currentStageIdx++;
-    initStage(currentStageIdx);
-  } else {
-    alert('위대한 여정의 끝! 30개의 별자리를 모두 완성하셨습니다!');
-    showLobby();
-  }
-}
-
-window.onload = () => createLobby();
