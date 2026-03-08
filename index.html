@@ -2,8 +2,11 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>진담중국어 - 중국어 별자리 퍼즐</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>진담 중국어 별자리(인환)</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -35,7 +38,8 @@
         <div id="victory-overlay" class="hidden">
           <div class="popup">
             <h2>✨ MISSION COMPLETE ✨</h2>
-            <p>문장 별자리가 깨어났습니다!</p>
+            <p>별자리가 문장으로 깨어났습니다!</p>
+            <div id="victory-answer" class="victory-answer"></div>
             <div class="popup-btns">
               <button onclick="showLobby()">로비로</button>
               <button onclick="loadNextStage()">다음 별자리</button>
@@ -44,6 +48,8 @@
         </div>
       </div>
     </div>
+
+    <script src="data.js"></script>
     <script src="scripts.js"></script>
   </body>
 </html>
